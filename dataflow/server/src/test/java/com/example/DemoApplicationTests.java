@@ -10,8 +10,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @SpringBootTest(classes = DataFlowServer.class)
 public class DemoApplicationTests {
 
- @Test
- public void contextLoads() {
- }
+    @Test
+    public void contextLoads() {
+    }
 
 }

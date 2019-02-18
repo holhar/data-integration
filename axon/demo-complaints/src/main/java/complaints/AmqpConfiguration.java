@@ -8,32 +8,32 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 class AmqpConfiguration {
 
- private static final String COMPLAINTS = "complaints";
+    private static final String COMPLAINTS = "complaints";
 
- // <1>
- @Bean
- Exchange exchange() {
-  return ExchangeBuilder.fanoutExchange(COMPLAINTS).build();
- }
+    // <1>
+    @Bean
+    Exchange exchange() {
+        return ExchangeBuilder.fanoutExchange(COMPLAINTS).build();
+    }
 
- // <2>
- @Bean
- Queue queue() {
-  return QueueBuilder.durable(COMPLAINTS).build();
- }
+    // <2>
+    @Bean
+    Queue queue() {
+        return QueueBuilder.durable(COMPLAINTS).build();
+    }
 
- // <3>
- @Bean
- Binding binding() {
-  return BindingBuilder.bind(queue()) //
-   .to(exchange()).with("*").noargs();
- }
+    // <3>
+    @Bean
+    Binding binding() {
+        return BindingBuilder.bind(queue()) //
+                .to(exchange()).with("*").noargs();
+    }
 
- // <4>
- @Autowired
- public void configure(AmqpAdmin admin) {
-  admin.declareExchange(exchange());
-  admin.declareQueue(queue());
-  admin.declareBinding(binding());
- }
+    // <4>
+    @Autowired
+    public void configure(AmqpAdmin admin) {
+        admin.declareExchange(exchange());
+        admin.declareQueue(queue());
+        admin.declareBinding(binding());
+    }
 }

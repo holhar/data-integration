@@ -15,73 +15,65 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-//@formatter:off
 @RestController
 @RequestMapping(value = "/complaints",
-  consumes = APPLICATION_JSON_VALUE,
-  produces = APPLICATION_JSON_VALUE)
+        consumes = APPLICATION_JSON_VALUE,
+        produces = APPLICATION_JSON_VALUE)
 class ComplaintsRestController {
-//@formatter:on
 
- private final CommandGateway cg;
+    private final CommandGateway cg;
 
- @Autowired
- ComplaintsRestController(CommandGateway cg) {
-  this.cg = cg;
- }
+    @Autowired
+    ComplaintsRestController(CommandGateway cg) {
+        this.cg = cg;
+    }
 
- // <1>
- @PostMapping
- CompletableFuture<ResponseEntity<?>> createComplaint(
-  @RequestBody Map<String, String> body) {
+    // <1>
+    @PostMapping
+    CompletableFuture<ResponseEntity<?>> createComplaint(@RequestBody Map<String, String> body) {
 
-  String id = UUID.randomUUID().toString();
-  FileComplaintCommand complaint = new FileComplaintCommand(id,
-   body.get("company"), body.get("description"));
+        String id = UUID.randomUUID().toString();
+        FileComplaintCommand complaint = new FileComplaintCommand(id, body.get("company"), body.get("description"));
 
-  return this.cg.send(complaint).thenApply(
-   complaintId -> {
-    URI uri = uri("/complaints/{id}",
-     Collections.singletonMap("id", complaint.getId()));
-    return ResponseEntity.created(uri).build();
-   });
- }
+        return this.cg.send(complaint).thenApply(
+                complaintId -> {
+                    URI uri = uri("/complaints/{id}", Collections.singletonMap("id", complaint.getId()));
+                    return ResponseEntity.created(uri).build();
+                });
+    }
 
- // <2>
- @PostMapping("/{complaintId}/comments")
- @ResponseStatus(HttpStatus.NOT_FOUND)
- CompletableFuture<ResponseEntity<?>> addComment(
-  @PathVariable String complaintId, @RequestBody Map<String, Object> body) {
+    // <2>
+    @PostMapping("/{complaintId}/comments")
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    CompletableFuture<ResponseEntity<?>> addComment(
+            @PathVariable String complaintId, @RequestBody Map<String, Object> body) {
 
-  Long when = Long.class.cast(body.getOrDefault("when",
-   System.currentTimeMillis()));
+        Long when = Long.class.cast(body.getOrDefault("when", System.currentTimeMillis()));
 
-  AddCommentCommand command = new AddCommentCommand(complaintId, UUID
-   .randomUUID().toString(), String.class.cast(body.get("comment")),
-   String.class.cast(body.get("user")), new Date(when));
+        AddCommentCommand command = new AddCommentCommand(complaintId, UUID.randomUUID().toString(),
+                String.class.cast(body.get("comment")),
+                String.class.cast(body.get("user")), new Date(when));
 
-  return this.cg.send(command).thenApply(commentId -> {
+        return this.cg.send(command).thenApply(commentId -> {
 
-   Map<String, String> parms = new HashMap<>();
-   parms.put("complaintId", complaintId);
-   parms.put("commentId", command.getCommentId());
+            Map<String, String> parms = new HashMap<>();
+            parms.put("complaintId", complaintId);
+            parms.put("commentId", command.getCommentId());
 
-   URI uri = uri("/complaints/{complaintId}/comments/{commentId}", parms);
+            URI uri = uri("/complaints/{complaintId}/comments/{commentId}", parms);
 
-   return ResponseEntity.created(uri).build();
-  });
- }
+            return ResponseEntity.created(uri).build();
+        });
+    }
 
- @DeleteMapping("/{complaintId}")
- CompletableFuture<ResponseEntity<?>> closeComplaint(
-  @PathVariable String complaintId) {
-  CloseComplaintCommand csc = new CloseComplaintCommand(complaintId);
-  return this.cg.send(csc).thenApply(none -> ResponseEntity.notFound().build());
- }
+    @DeleteMapping("/{complaintId}")
+    CompletableFuture<ResponseEntity<?>> closeComplaint(@PathVariable String complaintId) {
+        CloseComplaintCommand csc = new CloseComplaintCommand(complaintId);
+        return this.cg.send(csc).thenApply(none -> ResponseEntity.notFound().build());
+    }
 
- private static URI uri(String uri, Map<String, String> template) {
-  UriComponents uriComponents = UriComponentsBuilder.newInstance().path(uri)
-   .build().expand(template);
-  return uriComponents.toUri();
- }
+    private static URI uri(String uri, Map<String, String> template) {
+        UriComponents uriComponents = UriComponentsBuilder.newInstance().path(uri).build().expand(template);
+        return uriComponents.toUri();
+    }
 }

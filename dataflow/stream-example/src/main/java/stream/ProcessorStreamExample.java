@@ -16,13 +16,13 @@ import org.springframework.messaging.Message;
 @SpringBootApplication
 public class ProcessorStreamExample {
 
- public static void main(String[] args) {
-  SpringApplication.run(ProcessorStreamExample.class, args);
- }
+    public static void main(String[] args) {
+        SpringApplication.run(ProcessorStreamExample.class, args);
+    }
 
- @ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
- public Message<String> process(Message<String> in) {
-  return MessageBuilder.withPayload("{" + in.getPayload() + "}") // <3>
-   .copyHeadersIfAbsent(in.getHeaders()).build();
- }
+    @ServiceActivator(inputChannel = Processor.INPUT, outputChannel = Processor.OUTPUT)
+    public Message<String> process(Message<String> in) {
+        return MessageBuilder.withPayload("{" + in.getPayload() + "}") // <3>
+                .copyHeadersIfAbsent(in.getHeaders()).build();
+    }
 }

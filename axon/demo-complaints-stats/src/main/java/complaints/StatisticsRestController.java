@@ -13,21 +13,19 @@ import java.util.concurrent.atomic.AtomicLong;
 @ProcessingGroup("statistics")
 @RestController
 class StatisticsRestController {
- //@formatter:off
- private final ConcurrentMap<String, AtomicLong> statistics =
-  new ConcurrentHashMap<>();
- //@formatter:on
 
- //<2>
- @EventHandler
- public void on(ComplaintFiledEvent event) {
-  statistics.computeIfAbsent(event.getCompany(), k -> new AtomicLong())
-   .incrementAndGet();
- }
+    private final ConcurrentMap<String, AtomicLong> statistics = new ConcurrentHashMap<>();
 
- //<3>
- @GetMapping
- public ConcurrentMap<String, AtomicLong> showStatistics() {
-  return statistics;
- }
+    //<2>
+    @EventHandler
+    public void on(ComplaintFiledEvent event) {
+        statistics.computeIfAbsent(event.getCompany(), k -> new AtomicLong())
+                .incrementAndGet();
+    }
+
+    //<3>
+    @GetMapping
+    public ConcurrentMap<String, AtomicLong> showStatistics() {
+        return statistics;
+    }
 }

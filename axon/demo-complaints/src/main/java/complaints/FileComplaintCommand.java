@@ -10,9 +10,9 @@ import org.axonframework.commandhandling.TargetAggregateIdentifier;
 @NoArgsConstructor
 public class FileComplaintCommand {
 
- @TargetAggregateIdentifier
- private String id; // <1>
+    @TargetAggregateIdentifier
+    private String id; // <1>
 
- private String company, description; // <2>
+    private String company, description; // <2>
 
 }

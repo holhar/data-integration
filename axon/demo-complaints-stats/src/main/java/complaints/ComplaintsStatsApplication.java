@@ -13,20 +13,20 @@ import org.springframework.context.annotation.Bean;
 public class ComplaintsStatsApplication {
 
 
- public static void main(String[] args) {
-  SpringApplication.run(ComplaintsStatsApplication.class, args);
- }
+    public static void main(String[] args) {
+        SpringApplication.run(ComplaintsStatsApplication.class, args);
+    }
 
- //<1>
- @Bean
- SpringAMQPMessageSource statistics(Serializer serializer) {
-  return new SpringAMQPMessageSource(serializer) {
+    //<1>
+    @Bean
+    SpringAMQPMessageSource statistics(Serializer serializer) {
+        return new SpringAMQPMessageSource(serializer) {
 
-   @Override
-   @RabbitListener(queues = "complaints")
-   public void onMessage(Message message, Channel channel) throws Exception {
-    super.onMessage(message, channel);
-   }
-  };
- }
+            @Override
+            @RabbitListener(queues = "complaints")
+            public void onMessage(Message message, Channel channel) throws Exception {
+                super.onMessage(message, channel);
+            }
+        };
+    }
 }

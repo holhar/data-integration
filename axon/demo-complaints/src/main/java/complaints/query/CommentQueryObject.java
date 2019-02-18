@@ -13,14 +13,14 @@ import java.util.Date;
 @EqualsAndHashCode(exclude = "complaint")
 public class CommentQueryObject {
 
- @ManyToOne(fetch = FetchType.LAZY)
- @JoinColumn(name = "COMPLAINT_ID")
- private ComplaintQueryObject complaint;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "COMPLAINT_ID")
+    private ComplaintQueryObject complaint;
 
- @Id
- private String id;
+    @Id
+    private String id;
 
- private String comment, user;
+    private String comment, user;
 
- private Date when;
+    private Date when;
 }

@@ -9,7 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class CommentAddedEvent {
 
- private String complaintId, commentId, comment, user;
+    private String complaintId, commentId, comment, user;
 
- private Date when;
+    private Date when;
 }

@@ -118,36 +118,23 @@ public class DataFlowIT {
 
         // CF authentication
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_ORG", System.getenv("CF_ORG"));
-        env
-                .put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_SPACE", System.getenv("CF_SPACE"));
-        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_USERNAME",
-                System.getenv("CF_USER"));
-        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_PASSWORD",
-                System.getenv("CF_PASSWORD"));
+        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_SPACE", System.getenv("CF_SPACE"));
+        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_USERNAME", System.getenv("CF_USER"));
+        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_PASSWORD", System.getenv("CF_PASSWORD"));
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_TASK_API_TIMEOUT", "120");
-
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_STREAM_SERVICES", serverRabbit);
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_TASK_SERVICES", serverMysql);
-
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_SKIP_SSL_VALIDATION", "false");
-        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_URL",
-                "https://api.run.pivotal.io");
+        env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_URL", "https://api.run.pivotal.io");
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_DOMAIN", "cfapps.io");
-
-        env
-                .put("MAVEN_REMOTE_REPOSITORIES_LR_URL",
+        env.put("MAVEN_REMOTE_REPOSITORIES_LR_URL",
                         "https://cloudnativejava.artifactoryonline.com/cloudnativejava/libs-release");
-        env
-                .put("MAVEN_REMOTE_REPOSITORIES_LS_URL",
+        env.put("MAVEN_REMOTE_REPOSITORIES_LS_URL",
                         "https://cloudnativejava.artifactoryonline.com/cloudnativejava/libs-snapshot");
-        env
-                .put("MAVEN_REMOTE_REPOSITORIES_PR_URL",
+        env.put("MAVEN_REMOTE_REPOSITORIES_PR_URL",
                         "https://cloudnativejava.artifactoryonline.com/cloudnativejava/plugins-release");
-        env
-                .put(
-                        "MAVEN_REMOTE_REPOSITORIES_PS_URL",
+        env.put("MAVEN_REMOTE_REPOSITORIES_PS_URL",
                         "https://cloudnativejava.artifactoryonline.com/cloudnativejava/plugins-snapshot");
-
         env.put("SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_STREAM_INSTANCES", "1");
 
         env.forEach((k, v) -> {
@@ -168,8 +155,7 @@ public class DataFlowIT {
 
                     this.cloudFoundryOperations
                             .services()
-                            .bind(
-                                    BindServiceInstanceRequest.builder().applicationName(appName)
+                            .bind(BindServiceInstanceRequest.builder().applicationName(appName)
                                             .serviceInstanceName(svc).build()).block();
                     log.info("binding " + svc + " to " + appName);
                 });
@@ -177,8 +163,7 @@ public class DataFlowIT {
         // start
         this.cloudFoundryOperations
                 .applications()
-                .start(
-                        StartApplicationRequest.builder().stagingTimeout(Duration.ofMinutes(10))
+                .start(StartApplicationRequest.builder().stagingTimeout(Duration.ofMinutes(10))
                                 .startupTimeout(Duration.ofMinutes(10)).name(appName).build()).block();
 
         log.info("started the Spring Cloud Data Flow Cloud Foundry server.");
@@ -193,18 +178,15 @@ public class DataFlowIT {
             streams
                     .entrySet()
                     .parallelStream()
-                    .forEach(
-                            stream -> {
+                    .forEach(stream -> {
                                 String streamName = stream.getKey();
 
-                                StreamSupport
-                                        .stream(
-                                                Spliterators.spliteratorUnknownSize(df.streamOperations().list()
+                                StreamSupport.stream(Spliterators.spliteratorUnknownSize(df.streamOperations().list()
                                                         .iterator(), Spliterator.ORDERED), false)
                                         .filter(sdr -> sdr.getName().equals(streamName)).forEach(tdr -> {
-                                    log.info("deploying stream " + streamName);
-                                    df.streamOperations().destroy(streamName);
-                                });
+                                            log.info("deploying stream " + streamName);
+                                            df.streamOperations().destroy(streamName);
+                                        });
 
                                 df.streamOperations().createStream(streamName, stream.getValue(), true);
                             });
@@ -217,28 +199,25 @@ public class DataFlowIT {
             tasks.put("my-simple-task", "simple-task");
 
             log.info("going to deploy " + tasks.size() + " new task(s).");
-            tasks
-                    .entrySet()
-                    .parallelStream()
-                    .forEach(
-                            task -> {
+            tasks.entrySet()
+                .parallelStream()
+                .forEach(
+                        task -> {
+                            String taskName = task.getKey();
 
-                                String taskName = task.getKey();
-
-                                StreamSupport
-                                        .stream(
-                                                Spliterators.spliteratorUnknownSize(df.taskOperations().list()
+                            StreamSupport.stream(
+                                            Spliterators.spliteratorUnknownSize(df.taskOperations().list()
                                                         .iterator(), Spliterator.ORDERED), false)
-                                        .filter(tdr -> tdr.getName().equals(taskName)).forEach(tdr -> {
-                                    log.info("destroying task " + taskName);
-                                    df.taskOperations().destroy(taskName);
-                                });
+                                            .filter(tdr -> tdr.getName().equals(taskName)).forEach(tdr -> {
+                                                log.info("destroying task " + taskName);
+                                                df.taskOperations().destroy(taskName);
+                                            });
 
-                                log.info("deploying task " + taskName);
-                                TaskOperations to = df.taskOperations();
-                                to.create(taskName, task.getValue());
-                                to.launch(taskName, Collections.emptyMap(),
-                                        Collections.singletonList(System.currentTimeMillis() + ""));
+                            log.info("deploying task " + taskName);
+                            TaskOperations to = df.taskOperations();
+                            to.create(taskName, task.getValue());
+                            to.launch(taskName, Collections.emptyMap(),
+                                    Collections.singletonList(System.currentTimeMillis() + ""));
                             });
         };
     }
@@ -264,13 +243,10 @@ public class DataFlowIT {
 
     private List<String> appDefinitions() {
         List<String> apps = new ArrayList<>();
-        apps
-                .add("http://repo.spring.io/libs-release-local/org/springframework/cloud/task/app/spring-cloud-task-app-descriptor/Addison.RELEASE/spring-cloud-task-app-descriptor-Addison.RELEASE.task-apps-maven");
-        apps
-                .add("http://repo.spring.io/libs-release/org/springframework/cloud/stream/app/spring-cloud-stream-app-descriptor/Avogadro.SR1/spring-cloud-stream-app-descriptor-Avogadro.SR1.stream-apps-rabbit-maven");
+        apps.add("http://repo.spring.io/libs-release-local/org/springframework/cloud/task/app/spring-cloud-task-app-descriptor/Addison.RELEASE/spring-cloud-task-app-descriptor-Addison.RELEASE.task-apps-maven");
+        apps.add("http://repo.spring.io/libs-release/org/springframework/cloud/stream/app/spring-cloud-stream-app-descriptor/Avogadro.SR1/spring-cloud-stream-app-descriptor-Avogadro.SR1.stream-apps-rabbit-maven");
 
-        Optional
-                .ofNullable(this.cloudFoundryService.urlForApplication("server-definitions"))
+        Optional.ofNullable(this.cloudFoundryService.urlForApplication("server-definitions"))
                 .map(x -> x + "/dataflow-example-apps.properties").ifPresent(apps::add);
 
         apps.forEach(x -> log.info("registering: " + x));

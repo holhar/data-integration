@@ -13,55 +13,55 @@ import static org.axonframework.commandhandling.model.AggregateLifecycle.apply;
 @Aggregate
 public class ComplaintAggregate {
 
- // <2>
- @AggregateIdentifier
- private String complaintId;
+    // <2>
+    @AggregateIdentifier
+    private String complaintId;
 
- private boolean closed;
+    private boolean closed;
 
- public ComplaintAggregate() {
- }
+    public ComplaintAggregate() {
+    }
 
- // <3>
- @CommandHandler
- public ComplaintAggregate(FileComplaintCommand c) {
-  Assert.hasLength(c.getCompany());
-  Assert.hasLength(c.getDescription());
-  apply(new ComplaintFiledEvent(c.getId(), c.getCompany(), c.getDescription()));
- }
+    // <3>
+    @CommandHandler
+    public ComplaintAggregate(FileComplaintCommand c) {
+        Assert.hasLength(c.getCompany());
+        Assert.hasLength(c.getDescription());
+        apply(new ComplaintFiledEvent(c.getId(), c.getCompany(), c.getDescription()));
+    }
 
- // <4>
- @CommandHandler
- public void resolveComplaint(CloseComplaintCommand ccc) {
-  if (!this.closed) {
-   apply(new ComplaintClosedEvent(this.complaintId));
-  }
- }
+    // <4>
+    @CommandHandler
+    public void resolveComplaint(CloseComplaintCommand ccc) {
+        if (!this.closed) {
+            apply(new ComplaintClosedEvent(this.complaintId));
+        }
+    }
 
- // <5>
- @CommandHandler
- public void addComment(AddCommentCommand c) {
-  Assert.hasLength(c.getComment());
-  Assert.hasLength(c.getCommentId());
-  Assert.hasLength(c.getComplaintId());
-  Assert.hasLength(c.getUser());
-  Assert.notNull(c.getWhen());
-  Assert.isTrue(!this.closed);
-  apply(new CommentAddedEvent(c.getComplaintId(), c.getCommentId(),
-   c.getComment(), c.getUser(), c.getWhen()));
- }
+    // <5>
+    @CommandHandler
+    public void addComment(AddCommentCommand c) {
+        Assert.hasLength(c.getComment());
+        Assert.hasLength(c.getCommentId());
+        Assert.hasLength(c.getComplaintId());
+        Assert.hasLength(c.getUser());
+        Assert.notNull(c.getWhen());
+        Assert.isTrue(!this.closed);
+        apply(new CommentAddedEvent(c.getComplaintId(), c.getCommentId(),
+                c.getComment(), c.getUser(), c.getWhen()));
+    }
 
- // <6>
- @EventSourcingHandler
- protected void on(ComplaintFiledEvent cfe) {
-  this.complaintId = cfe.getId();
-  this.closed = false;
- }
+    // <6>
+    @EventSourcingHandler
+    protected void on(ComplaintFiledEvent cfe) {
+        this.complaintId = cfe.getId();
+        this.closed = false;
+    }
 
- // <7>
- @EventSourcingHandler
- protected void on(ComplaintClosedEvent cce) {
-  this.closed = true;
- }
+    // <7>
+    @EventSourcingHandler
+    protected void on(ComplaintClosedEvent cce) {
+        this.closed = true;
+    }
 
 }

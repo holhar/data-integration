@@ -16,39 +16,39 @@ import java.util.Map;
 @Component
 public class CircuitBreakerGreetingClient implements GreetingClient {
 
- private final RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
- private final String serviceUri;
+    private final String serviceUri;
 
- private Log log = LogFactory.getLog(getClass());
+    private Log log = LogFactory.getLog(getClass());
 
- @Autowired
- public CircuitBreakerGreetingClient(RestTemplate restTemplate,
-  @Value("${greeting-service.uri}") String uri) {
-  this.restTemplate = restTemplate;
-  this.serviceUri = uri;
- }
+    @Autowired
+    public CircuitBreakerGreetingClient(RestTemplate restTemplate,
+                                        @Value("${greeting-service.uri}") String uri) {
+        this.restTemplate = restTemplate;
+        this.serviceUri = uri;
+    }
 
- //<1>
- @HystrixCommand(fallbackMethod = "fallback")
- public String greet(String name) {
-  long time = System.currentTimeMillis();
-  Date now = new Date(time);
-  this.log.info("attempting to call " + "the greeting-service " + time + "/"
-   + now.toString());
+    //<1>
+    @HystrixCommand(fallbackMethod = "fallback")
+    public String greet(String name) {
+        long time = System.currentTimeMillis();
+        Date now = new Date(time);
+        this.log.info("attempting to call " + "the greeting-service " + time + "/"
+                + now.toString());
 
-  //@formatter:off
-  ParameterizedTypeReference<Map<String, String>> ptr =
-   new ParameterizedTypeReference<Map<String, String>>() {
-   };
-  //@formatter:on
-  return this.restTemplate
-   .exchange(this.serviceUri + "/hi/" + name, HttpMethod.GET, null, ptr, name)
-   .getBody().get("greeting");
- }
+        //@formatter:off
+        ParameterizedTypeReference<Map<String, String>> ptr =
+                new ParameterizedTypeReference<Map<String, String>>() {
+                };
+        //@formatter:on
+        return this.restTemplate
+                .exchange(this.serviceUri + "/hi/" + name, HttpMethod.GET, null, ptr, name)
+                .getBody().get("greeting");
+    }
 
- public String fallback(String name) {
-  return "OHAI";
- }
+    public String fallback(String name) {
+        return "OHAI";
+    }
 
 }
